@@ -4,7 +4,6 @@ using HarmonyLib;
 using LobbyCompatibility.Attributes;
 using LobbyCompatibility.Enums;
 using UnityEngine;
-using LethalLib;
 using System.IO;
 using System.Reflection;
 using ThrowableBrick.Patches;
@@ -30,7 +29,6 @@ public class ThrowableBrick : BaseUnityPlugin
         Patch();
 
         Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
-        Logger.LogInfo("FUCK!");
 
         InitializeItem();
     }
@@ -65,7 +63,7 @@ public class ThrowableBrick : BaseUnityPlugin
             return;
         }
 
-        int rarity = 100000;
+        int rarity = 25;
         Item throwableBrickItem = BrickAsset.LoadAsset<Item>("Assets/BRICK/BrickItem.asset");
         BrickBehavior brickBehavior = throwableBrickItem.spawnPrefab.AddComponent<BrickBehavior>();
         brickBehavior.grabbable = true;

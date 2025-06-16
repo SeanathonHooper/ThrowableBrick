@@ -7,8 +7,8 @@ namespace ThrowableBrick.Patches
 
         private Ray brickThrowRay;
         private int brickMask = 268437761;
-        public RaycastHit brickHit;
-        bool hasCollided = false;
+        private RaycastHit brickHit;
+        private bool hasCollided = false;
         private int health = 3;
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
