@@ -1,5 +1,7 @@
 ﻿using BepInEx.Logging;
+using DunGen;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 namespace ThrowableBrick.Patches
 {
     class BrickBehavior : PhysicsProp
@@ -8,32 +10,37 @@ namespace ThrowableBrick.Patches
         private Ray brickThrowRay;
         private int brickMask = 268437761;
         private RaycastHit brickHit;
-        private bool hasCollided = false;
+        public bool isExplosive = true;
         private int health = 3;
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
+            Debug.Log("ACTIVATED!");
 
+            scrapValue = (int)(scrapValue * .66);
+            health--;
             playerHeldBy.DiscardHeldObject(true, null, GetThrowDestination());
         }
 
+        public override void Start()
+        {
+            base.Start();
+        }
         public override void OnHitGround()
         {
             base.OnHitGround();
-            health--;
+            
             if (health <= 0)
             {
-                Landmine.SpawnExplosion(transform.position, true);
+                if (isExplosive == true)
+                {
+                    Landmine.SpawnExplosion(transform.position + Vector3.up, true, 5.7f, 6f, 37, 10f);
+                }
                 DestroyObjectInHand(playerHeldBy);
             }
         }
 
-        public override void EquipItem()
-        {
-            base.EquipItem();
-            hasCollided = false;
-        }
-        public Vector3 GetThrowDestination()
+        private Vector3 GetThrowDestination()
         {
             Vector3 position = base.transform.position;
             Debug.DrawRay(playerHeldBy.gameplayCamera.transform.position, playerHeldBy.gameplayCamera.transform.forward, Color.yellow, 15f);
