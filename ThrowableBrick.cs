@@ -38,15 +38,20 @@ public class ThrowableBrick : BaseUnityPlugin
 
         
 
-        int rarity = 08;
+        int rarity = 100;
         Item throwableBrickItem = BrickAsset.LoadAsset<Item>("Assets/BRICK/BrickItem.asset");
         BrickBehavior brickBehavior = throwableBrickItem.spawnPrefab.AddComponent<BrickBehavior>();
+
         brickBehavior.grabbable = true;
         brickBehavior.grabbableToEnemies = true;
         brickBehavior.itemProperties = throwableBrickItem;
+
         throwableBrickItem.minValue = 80;
         throwableBrickItem.maxValue = 200;
+        throwableBrickItem.weight = 1.0476f;
+
         brickBehavior.isExplosive = bool.Parse(File.ReadAllText(Path.Combine(sAssemblyLocation, "settings.txt")));
+
         LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(throwableBrickItem.spawnPrefab);
         LethalLib.Modules.Items.RegisterScrap(throwableBrickItem, rarity, LethalLib.Modules.Levels.LevelTypes.All);
     }
