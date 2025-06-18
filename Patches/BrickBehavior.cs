@@ -11,7 +11,6 @@ namespace ThrowableBrick.Patches
         private Ray brickThrowRay;
         private int brickMask = 268437761;
         private RaycastHit brickHit;
-        private RaycastHit brickHitEntity;
         PlayerControllerB playerThrower = null;
         public bool isExplosive = true;
         private int health = 3;
@@ -68,11 +67,6 @@ namespace ThrowableBrick.Patches
             }  
         }
 
-        public override void Start()
-        {
-            base.Start();
-
-        }
         public override void OnHitGround()
         {
             base.OnHitGround();
