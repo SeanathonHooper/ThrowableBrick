@@ -15,6 +15,7 @@ namespace ThrowableBrick.Patches
         public bool isExplosive = true;
         private int health = 3;
         private bool isThrown = false;
+
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
@@ -26,6 +27,11 @@ namespace ThrowableBrick.Patches
             isThrown = true;
             playerThrower = playerHeldBy;
             playerHeldBy.DiscardHeldObject(true, null, GetThrowDestination());
+        }
+
+        public override void Start()
+        {
+            base.Start();
         }
 
         public override void Update()
@@ -71,6 +77,12 @@ namespace ThrowableBrick.Patches
         {
             base.OnHitGround();
             isThrown = false;
+
+            if (this.transform.Find("Brick").gameObject.activeSelf)
+            {
+                this.transform.Find("Brick").gameObject.SetActive(false);
+                this.transform.Find("BrickDamaged").gameObject.SetActive(true);
+            }
             
             if (health <= 0)
             {
