@@ -11,7 +11,11 @@ namespace ThrowableBrick.Patches
         private RaycastHit brickHit;
         PlayerControllerB playerThrower = null;
         public bool isExplosive = true;
-        private int health = 5;
+        public int health = 5;
+        public int entityDamage = 3;
+        public int playerDamage = 20;
+        public int explosiveDamange = 37;
+        public bool damagePlayers = true;
         private bool isThrown = false;
         private HashSet<Collider> hits = new HashSet<Collider>();
 
@@ -22,7 +26,7 @@ namespace ThrowableBrick.Patches
             {
                 if (isExplosive)
                 {
-                    Landmine.SpawnExplosion(transform.position + Vector3.up, true, 5.7f, 6f, 37, 10f);
+                    Landmine.SpawnExplosion(transform.position + Vector3.up, true, 5.7f, 6f, explosiveDamange, 10f);
                 }
                 DestroyObjectInHand(playerHeldBy);
             }
@@ -55,18 +59,22 @@ namespace ThrowableBrick.Patches
                     }
                     if (hit.gameObject.layer == 3)
                     {
+                        if (!damagePlayers)
+                        {
+                            continue;
+                        }
                         PlayerControllerB playerHit = hit.gameObject.GetComponent<PlayerControllerB>();
                         if (playerHit != playerThrower)
                         {
                             Debug.Log($"Hit {playerHit.gameObject.name}");
-                            playerHit.DamagePlayer(20);
+                            playerHit.DamagePlayer(playerDamage);
                             hits.Add(hit);
                         }
                     }
                     else if (hit.gameObject.layer == 19)
                     {
                         EnemyAICollisionDetect enemyHit = hit.gameObject.GetComponentInChildren<EnemyAICollisionDetect>();
-                        enemyHit.mainScript.HitEnemy(5, playerHeldBy, true);
+                        enemyHit.mainScript.HitEnemy(entityDamage, playerHeldBy, true);
                         Debug.Log($"Hit {enemyHit.gameObject.name}");
                         hits.Add(hit);
                     }

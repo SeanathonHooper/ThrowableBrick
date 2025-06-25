@@ -29,6 +29,7 @@ public class ThrowableBrick : BaseUnityPlugin
     internal static void InitializeItem()
     {
         string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        BrickCustomization itemJson = JsonUtility.FromJson<BrickCustomization>(File.ReadAllText(Path.Combine(sAssemblyLocation, "settings.json")));
         BrickAsset = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "brickassetbundle"));
         if (BrickAsset == null)
         {
@@ -36,22 +37,27 @@ public class ThrowableBrick : BaseUnityPlugin
             return;
         }
 
-        
-
-        int rarity = 100;
         Item throwableBrickItem = BrickAsset.LoadAsset<Item>("Assets/BRICK/BrickItem.asset");
         BrickBehavior brickBehavior = throwableBrickItem.spawnPrefab.AddComponent<BrickBehavior>();
 
         brickBehavior.grabbable = true;
-        brickBehavior.grabbableToEnemies = true;
         brickBehavior.itemProperties = throwableBrickItem;
 
-        throwableBrickItem.minValue = 80;
-        throwableBrickItem.maxValue = 200;
-        throwableBrickItem.weight = 1.0952f;
+        int rarity = itemJson.itemRarity;
+        throwableBrickItem.minValue = (int)(itemJson.minValue / .4);
+        throwableBrickItem.maxValue = (int)(itemJson.maxValue / .4);
+        throwableBrickItem.weight = (float)((itemJson.weight / 105f) + 1);
+        brickBehavior.isExplosive = itemJson.funnyMode;
+        brickBehavior.grabbableToEnemies = itemJson.grabbableToEnemies;
+        brickBehavior.health = itemJson.brickHealth;
+        brickBehavior.explosiveDamange = itemJson.funnyModeExplosionDamage;
+        brickBehavior.entityDamage = itemJson.entityDamage;
+        brickBehavior.playerDamage = itemJson.playerDamage;
+        brickBehavior.damagePlayers = itemJson.damagePlayers;
 
-
-        brickBehavior.isExplosive = bool.Parse(File.ReadAllText(Path.Combine(sAssemblyLocation, "settings.txt")));
+        Debug.Log(throwableBrickItem.minValue);
+        Debug.Log(throwableBrickItem.weight);
+        Debug.Log(brickBehavior.grabbableToEnemies);
 
         LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(throwableBrickItem.spawnPrefab);
         LethalLib.Modules.Items.RegisterScrap(throwableBrickItem, rarity, LethalLib.Modules.Levels.LevelTypes.All);
