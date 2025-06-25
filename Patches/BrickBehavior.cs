@@ -1,8 +1,6 @@
-﻿using BepInEx.Logging;
-using DunGen;
-using GameNetcodeStuff;
+﻿using GameNetcodeStuff;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 namespace ThrowableBrick.Patches
 {
     class BrickBehavior : PhysicsProp
@@ -13,15 +11,33 @@ namespace ThrowableBrick.Patches
         private RaycastHit brickHit;
         PlayerControllerB playerThrower = null;
         public bool isExplosive = true;
-        private int health = 3;
+        private int health = 5;
         private bool isThrown = false;
+        private HashSet<Collider> hits;
+
+        private void DamageBrick()
+        {
+            health--;
+            if (health <= 0)
+            {
+                if (isExplosive)
+                {
+                    if (isExplosive == true)
+                    {
+                        Landmine.SpawnExplosion(transform.position + Vector3.up, true, 5.7f, 6f, 37, 10f);
+                    }
+                    DestroyObjectInHand(playerHeldBy);
+                }
+            }
+            SetScrapValue((int)(scrapValue * .72));
+        }
 
         public override void ItemActivate(bool used, bool buttonDown = true)
         {
             base.ItemActivate(used, buttonDown);
             Debug.Log("ACTIVATED!");
 
-            SetScrapValue((int)(scrapValue * .66));
+            
             health--;
 
             isThrown = true;
@@ -29,33 +45,33 @@ namespace ThrowableBrick.Patches
             playerHeldBy.DiscardHeldObject(true, null, GetThrowDestination());
         }
 
-        public override void Start()
-        {
-            base.Start();
-        }
-
         public override void Update()
         {
             base.Update();
             if (isThrown)
             {
-                Collider[] hits = Physics.OverlapSphere(transform.position, 2, 2621448, QueryTriggerInteraction.Collide);
-                foreach (Collider hit in hits)
+                Collider[] currentHits = Physics.OverlapSphere(transform.position, 1, 2621448, QueryTriggerInteraction.Collide);
+                
+                foreach (Collider hit in currentHits)
                 {
+                    if (hits.Contains(hit))
+                    {
+                        return;
+                    }
                     if (hit.gameObject.layer == 3)
                     {
                         PlayerControllerB playerHit = hit.gameObject.GetComponent<PlayerControllerB>();
                         if (playerHit != playerThrower)
                         {
                             playerHit.DamagePlayer(20);
-                            isThrown = false;
+                            hits.Add(hit);
                         }
                     }
-                    if (hit.gameObject.layer == 19)
+                    else if (hit.gameObject.layer == 19)
                     {
                         EnemyAICollisionDetect enemyHit = hit.gameObject.GetComponentInChildren<EnemyAICollisionDetect>();
                         enemyHit.mainScript.HitEnemy(5, playerHeldBy, true);
-                        isThrown = false;
+                        hits.Add(hit);
                     }
                 }
             }
@@ -76,22 +92,18 @@ namespace ThrowableBrick.Patches
         public override void OnHitGround()
         {
             base.OnHitGround();
-            isThrown = false;
 
-            if (this.transform.Find("Brick").gameObject.activeSelf)
+            hits.Clear();
+
+            if (isThrown == true && this.transform.Find("Brick").gameObject.activeSelf)
             {
                 this.transform.Find("Brick").gameObject.SetActive(false);
                 this.transform.Find("BrickDamaged").gameObject.SetActive(true);
             }
-            
-            if (health <= 0)
-            {
-                if (isExplosive == true)
-                {
-                    Landmine.SpawnExplosion(transform.position + Vector3.up, true, 5.7f, 6f, 37, 10f);
-                }
-                DestroyObjectInHand(playerHeldBy);
-            }
+
+            isThrown = false;
+
+            DamageBrick();
         }
 
         private Vector3 GetThrowDestination()

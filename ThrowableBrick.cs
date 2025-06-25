@@ -48,7 +48,7 @@ public class ThrowableBrick : BaseUnityPlugin
 
         throwableBrickItem.minValue = 80;
         throwableBrickItem.maxValue = 200;
-        throwableBrickItem.weight = 1.0476f;
+        throwableBrickItem.weight = 1.0952f;
 
         brickBehavior.isExplosive = bool.Parse(File.ReadAllText(Path.Combine(sAssemblyLocation, "settings.txt")));
 
