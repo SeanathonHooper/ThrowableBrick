@@ -29,6 +29,7 @@ namespace ThrowableBrick.Patches
                     DestroyObjectInHand(playerHeldBy);
                 }
             }
+
             SetScrapValue((int)(scrapValue * .72));
         }
 
@@ -36,9 +37,6 @@ namespace ThrowableBrick.Patches
         {
             base.ItemActivate(used, buttonDown);
             Debug.Log("ACTIVATED!");
-
-            
-            health--;
 
             isThrown = true;
             playerThrower = playerHeldBy;
