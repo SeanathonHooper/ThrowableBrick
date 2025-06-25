@@ -50,6 +50,7 @@ public class ThrowableBrick : BaseUnityPlugin
         throwableBrickItem.maxValue = 200;
         throwableBrickItem.weight = 1.0952f;
 
+
         brickBehavior.isExplosive = bool.Parse(File.ReadAllText(Path.Combine(sAssemblyLocation, "settings.txt")));
 
         LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(throwableBrickItem.spawnPrefab);

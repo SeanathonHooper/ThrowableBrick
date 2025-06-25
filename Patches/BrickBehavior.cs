@@ -13,7 +13,7 @@ namespace ThrowableBrick.Patches
         public bool isExplosive = true;
         private int health = 5;
         private bool isThrown = false;
-        private HashSet<Collider> hits;
+        private HashSet<Collider> hits = new HashSet<Collider>();
 
         private void DamageBrick()
         {
@@ -22,12 +22,9 @@ namespace ThrowableBrick.Patches
             {
                 if (isExplosive)
                 {
-                    if (isExplosive == true)
-                    {
-                        Landmine.SpawnExplosion(transform.position + Vector3.up, true, 5.7f, 6f, 37, 10f);
-                    }
-                    DestroyObjectInHand(playerHeldBy);
+                    Landmine.SpawnExplosion(transform.position + Vector3.up, true, 5.7f, 6f, 37, 10f);
                 }
+                DestroyObjectInHand(playerHeldBy);
             }
 
             SetScrapValue((int)(scrapValue * .72));
@@ -54,13 +51,14 @@ namespace ThrowableBrick.Patches
                 {
                     if (hits.Contains(hit))
                     {
-                        return;
+                        continue;
                     }
                     if (hit.gameObject.layer == 3)
                     {
                         PlayerControllerB playerHit = hit.gameObject.GetComponent<PlayerControllerB>();
                         if (playerHit != playerThrower)
                         {
+                            Debug.Log($"Hit {playerHit.gameObject.name}");
                             playerHit.DamagePlayer(20);
                             hits.Add(hit);
                         }
@@ -69,6 +67,7 @@ namespace ThrowableBrick.Patches
                     {
                         EnemyAICollisionDetect enemyHit = hit.gameObject.GetComponentInChildren<EnemyAICollisionDetect>();
                         enemyHit.mainScript.HitEnemy(5, playerHeldBy, true);
+                        Debug.Log($"Hit {enemyHit.gameObject.name}");
                         hits.Add(hit);
                     }
                 }
