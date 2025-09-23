@@ -100,15 +100,17 @@ namespace ThrowableBrick.Patches
 
             hits.Clear();
 
-            if (isThrown == true && this.transform.Find("Brick").gameObject.activeSelf)
+            if (isThrown)
             {
-                this.transform.Find("Brick").gameObject.SetActive(false);
-                this.transform.Find("BrickDamaged").gameObject.SetActive(true);
+                DamageBrick();
+                if (this.transform.Find("Brick").gameObject.activeSelf)
+                {
+                    this.transform.Find("Brick").gameObject.SetActive(false);
+                    this.transform.Find("BrickDamaged").gameObject.SetActive(true);
+                }
             }
 
             isThrown = false;
-
-            DamageBrick();
         }
 
         private Vector3 GetThrowDestination()
