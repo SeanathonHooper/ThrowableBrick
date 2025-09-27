@@ -109,7 +109,7 @@ namespace ThrowableBrick.Patches
             if (isThrown)
             {
                 DamageBrick();
-                if (!isDamaged && fracturedBrick != null)
+                if (!isDamaged && fracturedBrick != null && health != 0)
                 {
                     GameObject brokenBrick = Object.Instantiate(fracturedBrick.spawnPrefab, transform.position, Quaternion.identity);
                     brokenBrick.GetComponent<FracturedBrickBehavior>().health = health;
