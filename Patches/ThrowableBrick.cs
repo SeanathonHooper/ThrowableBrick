@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace ThrowableBrick.Patches;
 
+[BepInDependency("FlipMods.ReservedItemSlotCore", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class ThrowableBrick : BaseUnityPlugin
 {
@@ -14,6 +15,8 @@ public class ThrowableBrick : BaseUnityPlugin
     internal new static ManualLogSource Logger { get; private set; } = null!;
 
     public static AssetBundle BrickAsset;
+
+    public static bool useItemSlot = true;
 
 
     private void Awake()
@@ -24,6 +27,8 @@ public class ThrowableBrick : BaseUnityPlugin
         Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
 
         InitializeItem();
+        if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("FlipMods.ReservedItemSlotCore") && useItemSlot)
+            ReservedItemSlotCompat.CreateSlotsAddItems();
     }
 
 
@@ -74,6 +79,8 @@ public class ThrowableBrick : BaseUnityPlugin
         fracturedBrickBehavior.playerDamage = itemJson.fracturedPlayerDamage;
         fracturedBrickBehavior.damagePlayers = itemJson.damagePlayers;
         fracturedBrickBehavior.brickValueLoss = 1 - itemJson.brickValueLoss;
+
+        useItemSlot = itemJson.reservedItemSlot;
 
 
 

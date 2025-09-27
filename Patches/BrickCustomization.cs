@@ -21,6 +21,7 @@ namespace ThrowableBrick.Patches
         public float fractureWeight;
         public int fracturedEntityDamage;
         public int fracturedPlayerDamage;
+        public bool reservedItemSlot;
 
     }
 }
