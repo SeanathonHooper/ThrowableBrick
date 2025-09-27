@@ -5,36 +5,34 @@ using System.IO;
 using System.Reflection;
 using Unity.Netcode;
 using UnityEngine;
-using LethalConfig;
 
 namespace ThrowableBrick.Patches;
 
 [BepInDependency("FlipMods.ReservedItemSlotCore", BepInDependency.DependencyFlags.SoftDependency)]
-[BepInDependency("ainavt.lc.lethalconfig")]
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class ThrowableBrick : BaseUnityPlugin
 {
     public static ThrowableBrick Instance { get; private set; } = null!;
     internal new static ManualLogSource Logger { get; private set; } = null!;
 
-    public static AssetBundle BrickAsset;
+    public static AssetBundle? BrickAsset;
 
-    public static ConfigEntry<int> MinimumValue;
-    public static ConfigEntry<int> MaximumValue;
-    public static ConfigEntry<int> Weight;
-    public static ConfigEntry<int> EntityDamage;
-    public static ConfigEntry<int> PlayerDamage;
-    public static ConfigEntry<int> BrickHealth;
-    public static ConfigEntry<bool> GrabbableToEnemies;
-    public static ConfigEntry<int> ItemRarity;
-    public static ConfigEntry<bool> FunnyMode;
-    public static ConfigEntry<int> FunnyModeExplosionDamage;
-    public static ConfigEntry<bool> DamagePlayers;
-    public static ConfigEntry<float> BrickValueLoss;
-    public static ConfigEntry<int> FracturedWeight;
-    public static ConfigEntry<int> FracturedEntityDamage;
-    public static ConfigEntry<int> FracturedPlayerDamage;
-    public static ConfigEntry<bool> ReservedItemSlot;
+    public static ConfigEntry<int>? MinimumValue = null;
+    public static ConfigEntry<int>? MaximumValue = null;
+    public static ConfigEntry<int>? Weight = null;
+    public static ConfigEntry<int>? EntityDamage = null;
+    public static ConfigEntry<int>? PlayerDamage = null;
+    public static ConfigEntry<int>? BrickHealth = null;
+    public static ConfigEntry<bool>? GrabbableToEnemies = null;
+    public static ConfigEntry<int>? ItemRarity = null;
+    public static ConfigEntry<bool>? FunnyMode = null;
+    public static ConfigEntry<int>? FunnyModeExplosionDamage = null;
+    public static ConfigEntry<bool>? DamagePlayers = null;
+    public static ConfigEntry<float>? BrickValueLoss = null;
+    public static ConfigEntry<int>? FracturedWeight = null;
+    public static ConfigEntry<int>? FracturedEntityDamage = null;
+    public static ConfigEntry<int>? FracturedPlayerDamage = null;
+    public static ConfigEntry<bool>? ReservedItemSlot = null;
 
 
 
@@ -112,7 +110,7 @@ public class ThrowableBrick : BaseUnityPlugin
         BrickValueLoss = Config.Bind("General",
             "BrickValueLoss",
             0.28f,
-            "Percentage of scrap value lost on use (0.0–1.0).");
+            "Percentage of scrap value lost on when thrown (0.0–1.0), set to 1 for no value lost.");
         FracturedWeight = Config.Bind("General",
             "FractureWeight",
             7,
@@ -133,7 +131,6 @@ public class ThrowableBrick : BaseUnityPlugin
     internal static void InitializeItem()
     {
         string sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        BrickCustomization itemJson = JsonUtility.FromJson<BrickCustomization>(File.ReadAllText(Path.Combine(sAssemblyLocation, "settings.json")));
         BrickAsset = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "brickassetbundle"));
         if (BrickAsset == null)
         {
@@ -149,6 +146,7 @@ public class ThrowableBrick : BaseUnityPlugin
         brickBehavior.grabbable = true;
         brickBehavior.itemProperties = throwableBrickItem;
 
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
         int rarity = ItemRarity.Value;
         throwableBrickItem.minValue = MinimumValue.Value;
         throwableBrickItem.maxValue = MaximumValue.Value;
@@ -178,7 +176,7 @@ public class ThrowableBrick : BaseUnityPlugin
         fracturedBrickBehavior.damagePlayers = DamagePlayers.Value;
         fracturedBrickBehavior.brickValueLoss = 1 - BrickValueLoss.Value;
 
-        useItemSlot = itemJson.reservedItemSlot;
+        useItemSlot = ReservedItemSlot.Value;
 
 
 
@@ -186,5 +184,6 @@ public class ThrowableBrick : BaseUnityPlugin
         LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(fracturedThrowableBrickItem.spawnPrefab);
         LethalLib.Modules.Items.RegisterScrap(throwableBrickItem, rarity, LethalLib.Modules.Levels.LevelTypes.All);
         LethalLib.Modules.Items.RegisterScrap(fracturedThrowableBrickItem, rarity, LethalLib.Modules.Levels.LevelTypes.None);
+#pragma warning restore CS8602
     }
 }
