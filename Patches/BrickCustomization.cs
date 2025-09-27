@@ -17,5 +17,10 @@ namespace ThrowableBrick.Patches
         public int itemRarity;
         public bool funnyMode;
         public int funnyModeExplosionDamage;
+        public float brickValueLoss;
+        public float fractureWeight;
+        public int fracturedEntityDamage;
+        public int fracturedPlayerDamage;
+
     }
 }

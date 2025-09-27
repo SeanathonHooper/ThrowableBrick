@@ -1,12 +1,10 @@
 ﻿using GameNetcodeStuff;
-using Steamworks.Ugc;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
-namespace ThrowableBrick.Patches
+
+namespace ThrowableBrick
 {
-    class BrickBehavior : PhysicsProp
+   class FracturedBrickBehavior : PhysicsProp
     {
 
         protected Ray brickThrowRay;
@@ -23,7 +21,6 @@ namespace ThrowableBrick.Patches
         protected bool isThrown = false;
         protected HashSet<Collider> hits = new HashSet<Collider>();
         public bool isDamaged = false;
-        public Item fracturedBrick = null;
 
         protected void DamageBrick()
         {
@@ -56,7 +53,7 @@ namespace ThrowableBrick.Patches
             if (isThrown)
             {
                 Collider[] currentHits = Physics.OverlapSphere(transform.position, 1, 2621448, QueryTriggerInteraction.Collide);
-                
+
                 foreach (Collider hit in currentHits)
                 {
                     if (hits.Contains(hit))
@@ -97,7 +94,7 @@ namespace ThrowableBrick.Patches
             if (base.IsOwner)
             {
                 HUDManager.Instance.ChangeControlTipMultiple(allLines, true, itemProperties);
-            }  
+            }
         }
 
         public override void OnHitGround()
@@ -109,20 +106,6 @@ namespace ThrowableBrick.Patches
             if (isThrown)
             {
                 DamageBrick();
-                if (!isDamaged && fracturedBrick != null)
-                {
-                    GameObject brokenBrick = Object.Instantiate(fracturedBrick.spawnPrefab, transform.position, Quaternion.identity);
-                    brokenBrick.GetComponent<FracturedBrickBehavior>().health = health;
-                    brokenBrick.GetComponent<FracturedBrickBehavior>().SetScrapValue(scrapValue);
-
-                    // Make sure it's network-synced if multiplayer
-                    NetworkObject netObj = brokenBrick.GetComponent<NetworkObject>();
-                    if (netObj != null && !netObj.IsSpawned)
-                    {
-                        netObj.Spawn();
-                    }
-                    DestroyObjectInHand(playerHeldBy);
-                }
             }
 
             isThrown = false;
